@@ -8,7 +8,7 @@ class Point(val q: Int, val x: Int, val y: Int) {
   // оператор суммирования двух точек
   def +(other: Point): Point = {
     if (other == new Point(13, 0, 0)) this
-    else if (this == other) {
+    else if (this.x == other.x) {
       val lambda = module(calculateLambda(this.x, this.y, ellipticCurve.a), ellipticCurve.p)
 
       val newX = module(math.pow(lambda, 2).toInt - 2 * this.x, ellipticCurve.p)
