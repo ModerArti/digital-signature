@@ -1,6 +1,6 @@
 package ru.tversu.util
 
-import ru.tversu.DigitalSignatureGenerator.{ellipticCurve, module, reverseNumber}
+import ru.tversu.signature.DigitalSignatureGenerator.{ellipticCurve, module, reverseNumber}
 
 // класс, абстрагирующий в себе точку (её координаты и порядок)
 class Point(val q: Int, val x: Int, val y: Int) {
