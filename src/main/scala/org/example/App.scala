@@ -7,3 +7,5 @@ object App {
   }
 
 }
+
+case class Point(x: Int, y: Int)
