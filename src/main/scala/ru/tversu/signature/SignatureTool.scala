@@ -1,4 +1,4 @@
-package ru.tversu
+package ru.tversu.signature
 
 import ru.tversu.util.Point
 
