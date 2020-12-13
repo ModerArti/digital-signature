@@ -13,19 +13,30 @@ object DigitalSignatureGenerator {
     val generatingPoint = new Point(13, 416, 55)
 
     val kG = calculatekG(k, generatingPoint)
-    print(kG)
+    println(s"k * G = $kG")
+
+    val r = module(kG.x, generatingPoint.q)
+    println(s"r = $r")
+
+    val z = module(reverseNumber(k, generatingPoint.q), generatingPoint.q)
+    println(s"z = $z")
+
+    val s = module(z * (h + d * r), generatingPoint.q)
+    println(s"s = $s")
+
+    println(new Point(generatingPoint.q, r, s))
   }
 
   @tailrec
-  def module(number: Int): Int = {
-    if (number > 0) number % ellipticCurve.p
-    else module(number + ellipticCurve.p)
+  def module(number: Int, mod: Int): Int = {
+    if (number > 0) number % mod
+    else module(number + mod, mod)
   }
 
   @tailrec
-  def reverseNumber(number: Int, k: Int = 1): Int = {
-    if (module(number * k) == 1) k
-    else reverseNumber(number, k + 1)
+  def reverseNumber(number: Int, mod: Int, k: Int = 1): Int = {
+    if (module(number * k, mod) == 1) k
+    else reverseNumber(number, mod, k + 1)
   }
 
   @tailrec
@@ -39,17 +50,17 @@ object DigitalSignatureGenerator {
     def +(other: Point): Point = {
       if (other == new Point(13, 0, 0)) this
       else if (this == other) {
-        val lambda = module(calculateLambda(this.x, this.y, ellipticCurve.a))
+        val lambda = module(calculateLambda(this.x, this.y, ellipticCurve.a), ellipticCurve.p)
 
-        val newX = module(math.pow(lambda, 2).toInt - 2 * this.x)
-        val newY = module(lambda * (this.x - newX) - this.y)
+        val newX = module(math.pow(lambda, 2).toInt - 2 * this.x, ellipticCurve.p)
+        val newY = module(lambda * (this.x - newX) - this.y, ellipticCurve.p)
 
         new Point(this.q, newX, newY)
       } else {
-        val lambda = module(calculateLambda(this.x, this.y, other.x, other.y))
+        val lambda = module(calculateLambda(this.x, this.y, other.x, other.y), ellipticCurve.p)
 
-        val newX = module(math.pow(lambda, 2).toInt - this.x - other.x)
-        val newY = module(lambda * (this.x - newX) - this.y)
+        val newX = module(math.pow(lambda, 2).toInt - this.x - other.x, ellipticCurve.p)
+        val newY = module(lambda * (this.x - newX) - this.y, ellipticCurve.p)
 
         new Point(this.q, newX, newY)
       }
@@ -61,7 +72,7 @@ object DigitalSignatureGenerator {
       val numerator = factor * (3 * math.pow(x1, 2).toInt + a)
       val denominator = factor * 2 * y1
 
-      module(numerator * reverseNumber(denominator))
+      module(numerator * reverseNumber(denominator, ellipticCurve.p), ellipticCurve.p)
     }
 
     def calculateLambda(x1: Int, y1: Int, x2: Int, y2: Int): Int = {
@@ -70,7 +81,7 @@ object DigitalSignatureGenerator {
       val numerator = factor * (y2 - y1)
       val denominator = factor * (x2 - x1)
 
-      module(numerator * reverseNumber(denominator))
+      module(numerator * reverseNumber(denominator, ellipticCurve.p), ellipticCurve.p)
     }
 
     override def toString = s"Point($x, $y)"
